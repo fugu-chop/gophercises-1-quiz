@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
 	var correctAnswers int
 
 	// Parse command line flags
+	timerLengthPtr := flag.Int("timer", 30, "how long the quiz is available for")
 	fileNamePtr := flag.String("filename", "./problems.csv", "file location")
 	flag.Parse()
 
@@ -32,6 +34,19 @@ func main() {
 
 	totalQuestions := len(questions)
 
+	// Print Instructions
+	fmt.Printf("Welcome to the quiz! You have %d seconds to answer the entire quiz!", *timerLengthPtr)
+	fmt.Scanln()
+
+	// Start timer
+	go func(correctAnswers *int) {
+		time.Sleep(time.Duration(*timerLengthPtr) * time.Second)
+		fmt.Println("Time's up!")
+		fmt.Printf("You answered %d questions correctly out of %d total questions\n", *correctAnswers, totalQuestions)
+
+		os.Exit(1)
+	}(&correctAnswers)
+
 	// Iterate through questions
 	for _, question := range questions {
 		// Ask questions
@@ -47,5 +62,5 @@ func main() {
 		}
 	}
 
-	fmt.Printf("You got %d out of %d questions correct! Thanks for playing!\n", correctAnswers, totalQuestions)
+	fmt.Printf("You got %d out of %d questions correct! Thanks for playing!\n", &correctAnswers, totalQuestions)
 }
