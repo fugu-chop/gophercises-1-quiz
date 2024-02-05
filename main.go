@@ -1,6 +1,7 @@
 package main
 
 import (
+	csv "encoding/csv"
 	"flag"
 	"fmt"
 	"log"
@@ -20,10 +21,11 @@ func main() {
 	defer file.Close()
 
 	// Read data from file into memory
-	buffer := make([]byte, 1024)
-	rows, err := file.Read(buffer)
+	csvReader := csv.NewReader(file)
+	questions, err := csvReader.ReadAll()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("read %d bytes: %q\n", rows, buffer[:rows])
+
+	fmt.Println(questions)
 }
