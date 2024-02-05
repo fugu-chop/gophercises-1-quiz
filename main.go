@@ -1,24 +1,26 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
 )
 
-// Need to read in a file (assume in the same director)
-// Defaults to problems.csv, but need to accept other options via flag(?)
-// Quizzes are short, so can read entire file into memory
 func main() {
+	// Parse command line flags
+	fileNamePtr := flag.String("filename", "./problems.csv", "file location")
+	flag.Parse()
+
 	// Open file
-	file, err := os.Open("./problems.csv")
+	file, err := os.Open(*fileNamePtr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
 	// Read data from file into memory
-	buffer := make([]byte, 2048)
+	buffer := make([]byte, 1024)
 	rows, err := file.Read(buffer)
 	if err != nil {
 		log.Fatal(err)
