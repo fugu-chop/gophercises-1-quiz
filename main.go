@@ -65,7 +65,7 @@ func main() {
 		}
 	}
 
-	fmt.Printf("You got %d out of %d questions correct! Thanks for playing!\n", &correctAnswers, totalQuestions)
+	fmt.Printf("You got %d out of %d questions correct! Thanks for playing!\n", correctAnswers, totalQuestions)
 }
 
 func cleanAnswer(answer string) string {
