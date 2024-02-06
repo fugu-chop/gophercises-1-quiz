@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
+	"unicode"
 )
 
 func main() {
@@ -54,7 +56,8 @@ func main() {
 		var answer string
 		fmt.Scanln(&answer)
 
-		if answer == question[1] {
+		// Assume that the answers are all lowercase
+		if cleanAnswer(answer) == question[1] {
 			fmt.Println("Correct!")
 			correctAnswers++
 		} else {
@@ -63,4 +66,11 @@ func main() {
 	}
 
 	fmt.Printf("You got %d out of %d questions correct! Thanks for playing!\n", &correctAnswers, totalQuestions)
+}
+
+func cleanAnswer(answer string) string {
+	lowercaseString := strings.ToLower(answer)
+	return strings.TrimFunc(lowercaseString, func(r rune) bool {
+		return !unicode.IsLetter(r) && !unicode.IsNumber(r)
+	})
 }
