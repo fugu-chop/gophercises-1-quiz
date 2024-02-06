@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
@@ -15,6 +16,7 @@ func main() {
 	var correctAnswers int
 
 	// Parse command line flags
+	randomiseQuestionsPtr := flag.Bool("randomise", false, "whether the quiz questions are in random order")
 	timerLengthPtr := flag.Int("timer", 30, "how long the quiz is available for")
 	fileNamePtr := flag.String("filename", "./problems.csv", "file location")
 	flag.Parse()
@@ -49,6 +51,11 @@ func main() {
 		os.Exit(1)
 	}(&correctAnswers)
 
+	// Randomise depending on flag
+	if *randomiseQuestionsPtr {
+		questions = randomiseQuestions(questions)
+	}
+
 	// Iterate through questions
 	for _, question := range questions {
 		// Ask questions
@@ -73,4 +80,14 @@ func cleanAnswer(answer string) string {
 	return strings.TrimFunc(lowercaseString, func(r rune) bool {
 		return !unicode.IsLetter(r) && !unicode.IsNumber(r)
 	})
+}
+
+func randomiseQuestions(questions [][]string) [][]string {
+	var newQuestionsOrder = [][]string{}
+	questionOrder := rand.Perm(len(questions))
+	for _, order := range questionOrder {
+		newQuestionsOrder = append(newQuestionsOrder, questions[order])
+	}
+
+	return newQuestionsOrder
 }
