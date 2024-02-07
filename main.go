@@ -48,7 +48,7 @@ func main() {
 		fmt.Println("Time's up!")
 		fmt.Printf("You answered %d questions correctly out of %d total questions\n", *correctAnswers, totalQuestions)
 
-		os.Exit(1)
+		os.Exit(0)
 	}(&correctAnswers)
 
 	// Randomise depending on flag
