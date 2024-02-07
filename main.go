@@ -104,13 +104,13 @@ func randomiseQuestions(questions []problem) []problem {
 }
 
 func convertProblemFormat(questions [][]string) []problem {
-	parsedProblems := []problem{}
+	parsedProblems := make([]problem, len(questions))
 
-	for _, question := range questions {
-		parsedProblems = append(parsedProblems, problem{
+	for idx, question := range questions {
+		parsedProblems[idx] = problem{
 			q: question[0],
 			a: question[1],
-		})
+		}
 	}
 
 	return parsedProblems
