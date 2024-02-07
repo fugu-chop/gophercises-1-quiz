@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
@@ -20,7 +21,7 @@ func main() {
 	var correctAnswers int
 
 	// Parse command line flags
-	// randomiseQuestionsPtr := flag.Bool("randomise", false, "whether the quiz questions are in random order")
+	randomiseQuestionsPtr := flag.Bool("randomise", false, "whether the quiz questions are in random order")
 	timerLengthPtr := flag.Int("timer", 30, "how long the quiz is available for")
 	fileNamePtr := flag.String("filename", "./problems.csv", "file location")
 	flag.Parse()
@@ -62,9 +63,9 @@ func main() {
 	}(&correctAnswers)
 
 	// Randomise depending on flag
-	// if *randomiseQuestionsPtr {
-	// 	parsedQuestions = randomiseQuestions(parsedQuestions)
-	// }
+	if *randomiseQuestionsPtr {
+		parsedQuestions = randomiseQuestions(parsedQuestions)
+	}
 
 	// Iterate through questions
 	for _, question := range parsedQuestions {
@@ -92,15 +93,15 @@ func cleanAnswer(answer string) string {
 	})
 }
 
-// func randomiseQuestions(questions []problem) []problem {
-// 	var newQuestionsOrder = []problem{}
-// 	questionOrder := rand.Perm(len(questions))
-// 	for _, order := range questionOrder {
-// 		newQuestionsOrder = append(newQuestionsOrder, questions[order])
-// 	}
+func randomiseQuestions(questions []problem) []problem {
+	var newQuestionsOrder = []problem{}
+	questionOrder := rand.Perm(len(questions))
+	for _, order := range questionOrder {
+		newQuestionsOrder = append(newQuestionsOrder, questions[order])
+	}
 
-// 	return newQuestionsOrder
-// }
+	return newQuestionsOrder
+}
 
 func convertProblemFormat(questions [][]string) []problem {
 	parsedProblems := []problem{}
