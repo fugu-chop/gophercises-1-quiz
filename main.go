@@ -5,18 +5,22 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"strings"
 	"time"
 	"unicode"
 )
 
+type problem struct {
+	q string
+	a string
+}
+
 func main() {
 	var correctAnswers int
 
 	// Parse command line flags
-	randomiseQuestionsPtr := flag.Bool("randomise", false, "whether the quiz questions are in random order")
+	// randomiseQuestionsPtr := flag.Bool("randomise", false, "whether the quiz questions are in random order")
 	timerLengthPtr := flag.Int("timer", 30, "how long the quiz is available for")
 	fileNamePtr := flag.String("filename", "./problems.csv", "file location")
 	flag.Parse()
@@ -31,18 +35,24 @@ func main() {
 	// Read data from file into memory
 	csvReader := csv.NewReader(file)
 	questions, err := csvReader.ReadAll()
+
+	// Convert questions to struct as this reduces dependency on CSV format
+	parsedQuestions := convertProblemFormat(questions)
+
 	if err != nil {
 		// Will exit if cell lengths are not all the same
 		log.Fatal(err)
 	}
 
-	totalQuestions := len(questions)
+	totalQuestions := len(parsedQuestions)
 
 	// Print Instructions
 	fmt.Printf("Welcome to the quiz! You have %d seconds to answer the entire quiz!", *timerLengthPtr)
 	fmt.Scanln()
 
 	// Start timer
+	// Use pointer as the goroutine will otherwise capture the value
+	// at time of passing the variable
 	go func(correctAnswers *int) {
 		time.Sleep(time.Duration(*timerLengthPtr) * time.Second)
 		fmt.Println("Time's up!")
@@ -52,19 +62,19 @@ func main() {
 	}(&correctAnswers)
 
 	// Randomise depending on flag
-	if *randomiseQuestionsPtr {
-		questions = randomiseQuestions(questions)
-	}
+	// if *randomiseQuestionsPtr {
+	// 	parsedQuestions = randomiseQuestions(parsedQuestions)
+	// }
 
 	// Iterate through questions
-	for _, question := range questions {
+	for _, question := range parsedQuestions {
 		// Ask questions
-		fmt.Println(question[0])
+		fmt.Println(question.q)
 		var answer string
 		fmt.Scanln(&answer)
 
 		// Assume that the answers are all lowercase
-		if cleanAnswer(answer) == question[1] {
+		if cleanAnswer(answer) == question.a {
 			fmt.Println("Correct!")
 			correctAnswers++
 		} else {
@@ -82,12 +92,25 @@ func cleanAnswer(answer string) string {
 	})
 }
 
-func randomiseQuestions(questions [][]string) [][]string {
-	var newQuestionsOrder = [][]string{}
-	questionOrder := rand.Perm(len(questions))
-	for _, order := range questionOrder {
-		newQuestionsOrder = append(newQuestionsOrder, questions[order])
+// func randomiseQuestions(questions []problem) []problem {
+// 	var newQuestionsOrder = []problem{}
+// 	questionOrder := rand.Perm(len(questions))
+// 	for _, order := range questionOrder {
+// 		newQuestionsOrder = append(newQuestionsOrder, questions[order])
+// 	}
+
+// 	return newQuestionsOrder
+// }
+
+func convertProblemFormat(questions [][]string) []problem {
+	parsedProblems := []problem{}
+
+	for _, question := range questions {
+		parsedProblems = append(parsedProblems, problem{
+			q: question[0],
+			a: question[1],
+		})
 	}
 
-	return newQuestionsOrder
+	return parsedProblems
 }
